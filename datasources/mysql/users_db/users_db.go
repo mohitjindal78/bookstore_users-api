@@ -40,5 +40,4 @@ func init() {
 		panic(err)
 	}
 	log.Println("Connection made succesfully")
-	fmt.Println("Connection made succesfully")
 }

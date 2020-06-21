@@ -1,3 +1,4 @@
+//Package services package will interact with all external system
 package services
 
 import (
@@ -42,10 +43,17 @@ func UpdateUser(isPartial bool, user users.User) (*users.User, *errors.RestErr) 
 		if user.Email != "" {
 			current.Email = user.Email
 		}
+		if user.Status != "" {
+			current.Status = user.Status
+		}
+		if user.Password != "" {
+			current.Password = user.Password
+		}
 	} else {
 		current.FirstName = user.FirstName
 		current.LastName = user.LastName
 		current.Email = user.Email
+		current.Status = user.Status
 	}
 
 	if err := current.Update(); err != nil {
@@ -58,4 +66,10 @@ func UpdateUser(isPartial bool, user users.User) (*users.User, *errors.RestErr) 
 func DeleteUser(userId int64) *errors.RestErr {
 	user := &users.User{Id: userId}
 	return user.Delete()
+}
+
+//Search Func searches
+func Search(status string) ([]users.User, *errors.RestErr) {
+	dao := &users.User{}
+	return dao.FindByStatus(status)
 }

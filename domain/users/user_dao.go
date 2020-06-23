@@ -70,7 +70,6 @@ func (user *User) Update() *errors.RestErr {
 	}
 	defer stmt.Close()
 
-	fmt.Println("Password in doa update :", user.Password)
 	_, err = stmt.Exec(user.FirstName, user.LastName, user.Email, user.Status, user.Password, user.Id)
 	if err != nil {
 		return mysql_utils.ParseError(err)

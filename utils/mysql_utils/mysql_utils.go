@@ -3,6 +3,8 @@ package mysql_utils
 import (
 	"strings"
 
+	"github.com/mohitjindal78/bookstore_users-api/logger"
+
 	"github.com/mohitjindal78/bookstore_users-api/utils/errors"
 )
 
@@ -12,7 +14,7 @@ const (
 )
 
 //ParseError function handle mysql error.
-func ParseError(err error) *errors.RestErr {
+func ParseError(msg string, err error) *errors.RestErr {
 	if strings.Contains(err.Error(), errorNoRows) {
 		return errors.NewInternalServerError("user not found")
 	}
@@ -21,5 +23,6 @@ func ParseError(err error) *errors.RestErr {
 		return errors.NewBadRequestError("email id already exists")
 	}
 
-	return errors.NewInternalServerError(err.Error())
+	logger.Error(msg, err)
+	return errors.NewInternalServerError("database error")
 }

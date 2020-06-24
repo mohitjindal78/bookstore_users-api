@@ -26,7 +26,7 @@ var (
 func (user *User) Get() *errors.RestErr {
 	stmt, err := users_db.Client.Prepare(queryGetUser)
 	if err != nil {
-		return mysql_utils.ParseError(err)
+		return mysql_utils.ParseError("error while preparing get user", err)
 	}
 	defer stmt.Close()
 
@@ -34,7 +34,7 @@ func (user *User) Get() *errors.RestErr {
 
 	//scan will scan the result and populate pointer to given fields
 	if err := result.Scan(&user.Id, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated, &user.Status, &user.Password); err != nil {
-		return mysql_utils.ParseError(err)
+		return mysql_utils.ParseError("error while sca get user", err)
 	}
 
 	return nil
@@ -44,18 +44,18 @@ func (user *User) Get() *errors.RestErr {
 func (user *User) Save() *errors.RestErr {
 	stmt, err := users_db.Client.Prepare(queryInsertUser)
 	if err != nil {
-		return mysql_utils.ParseError(err)
+		return mysql_utils.ParseError("error while preparing save user", err)
 	}
 	defer stmt.Close()
 
 	insertResult, err := stmt.Exec(user.FirstName, user.LastName, user.Email, user.DateCreated, user.Status, user.Password)
 	if err != nil {
-		return mysql_utils.ParseError(err)
+		return mysql_utils.ParseError("error while exec save user", err)
 	}
 
 	userId, err := insertResult.LastInsertId()
 	if err != nil {
-		return mysql_utils.ParseError(err)
+		return mysql_utils.ParseError("error while retrieving lastinsert id user", err)
 	}
 	user.Id = userId
 
@@ -66,13 +66,13 @@ func (user *User) Save() *errors.RestErr {
 func (user *User) Update() *errors.RestErr {
 	stmt, err := users_db.Client.Prepare(queryUpdateUser)
 	if err != nil {
-		return mysql_utils.ParseError(err)
+		return mysql_utils.ParseError("error while preparing update user", err)
 	}
 	defer stmt.Close()
 
 	_, err = stmt.Exec(user.FirstName, user.LastName, user.Email, user.Status, user.Password, user.Id)
 	if err != nil {
-		return mysql_utils.ParseError(err)
+		return mysql_utils.ParseError("error while exec update user", err)
 	}
 	return nil
 }
@@ -81,12 +81,12 @@ func (user *User) Update() *errors.RestErr {
 func (user *User) Delete() *errors.RestErr {
 	stmt, err := users_db.Client.Prepare(queryDeleteUser)
 	if err != nil {
-		return mysql_utils.ParseError(err)
+		return mysql_utils.ParseError("error while preparing delete user", err)
 	}
 	defer stmt.Close()
 
 	if _, err = stmt.Exec(user.Id); err != nil {
-		return mysql_utils.ParseError(err)
+		return mysql_utils.ParseError("error while exec delete user", err)
 	}
 	return nil
 }
@@ -95,13 +95,13 @@ func (user *User) Delete() *errors.RestErr {
 func (user *User) FindByStatus(status string) ([]User, *errors.RestErr) {
 	stmt, err := users_db.Client.Prepare(queryFindUserByStatus)
 	if err != nil {
-		return nil, mysql_utils.ParseError(err)
+		return nil, mysql_utils.ParseError("error while preparing findbyuser user", err)
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(status)
 	if err != nil {
-		return nil, mysql_utils.ParseError(err)
+		return nil, mysql_utils.ParseError("error while query findbyuser user", err)
 	}
 	defer rows.Close()
 
@@ -109,7 +109,7 @@ func (user *User) FindByStatus(status string) ([]User, *errors.RestErr) {
 	for rows.Next() {
 		var user User
 		if err := rows.Scan(&user.Id, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated, &user.Status, &user.Password); err != nil {
-			return nil, mysql_utils.ParseError(err)
+			return nil, mysql_utils.ParseError("error while scan findbyuser user", err)
 		}
 		results = append(results, user)
 	}

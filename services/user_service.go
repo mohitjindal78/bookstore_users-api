@@ -8,8 +8,22 @@ import (
 	"github.com/mohitjindal78/bookstore_users-api/utils/errors"
 )
 
+var (
+	UsersService usersServiceInterface = &usersService{}
+)
+
+type usersService struct{}
+
+type usersServiceInterface interface {
+	GetUser(int64) (*users.User, *errors.RestErr)
+	CreateUser(users.User) (*users.User, *errors.RestErr)
+	UpdateUser(bool, users.User) (*users.User, *errors.RestErr)
+	DeleteUser(int64) *errors.RestErr
+	SearchUser(string) (users.Users, *errors.RestErr)
+}
+
 //GetUser Func updates
-func GetUser(userId int64) (*users.User, *errors.RestErr) {
+func (s *usersService) GetUser(userId int64) (*users.User, *errors.RestErr) {
 	user := &users.User{Id: userId}
 	if err := user.Get(); err != nil {
 		return nil, err
@@ -18,7 +32,7 @@ func GetUser(userId int64) (*users.User, *errors.RestErr) {
 }
 
 //CreateUser Func updates
-func CreateUser(user users.User) (*users.User, *errors.RestErr) {
+func (s *usersService) CreateUser(user users.User) (*users.User, *errors.RestErr) {
 	if err := user.Validate(); err != nil {
 		return nil, err
 	}
@@ -33,9 +47,9 @@ func CreateUser(user users.User) (*users.User, *errors.RestErr) {
 }
 
 //UpdateUser Func updates
-func UpdateUser(isPartial bool, user users.User) (*users.User, *errors.RestErr) {
-	current, err := GetUser(user.Id)
-	if err != nil {
+func (s *usersService) UpdateUser(isPartial bool, user users.User) (*users.User, *errors.RestErr) {
+	current := &users.User{Id: user.Id}
+	if err := current.Get(); err != nil {
 		return nil, err
 	}
 
@@ -69,13 +83,13 @@ func UpdateUser(isPartial bool, user users.User) (*users.User, *errors.RestErr) 
 }
 
 //DeleteUser Func updates
-func DeleteUser(userId int64) *errors.RestErr {
+func (s *usersService) DeleteUser(userId int64) *errors.RestErr {
 	user := &users.User{Id: userId}
 	return user.Delete()
 }
 
 //Search Func searches
-func SearchUser(status string) (users.Users, *errors.RestErr) {
+func (s *usersService) SearchUser(status string) (users.Users, *errors.RestErr) {
 	dao := &users.User{}
 	return dao.FindByStatus(status)
 }
